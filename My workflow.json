@@ -1,0 +1,150 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "87ce867a-7990-4496-81d0-273766d6c7af",
+      "name": "When chat message received",
+      "webhookId": "a26df597-e24e-45c2-8f3b-42532c3dc01c"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an email assistant with access to a Gmail sending tool.\n\nWhen the user asks you to send an email, use the connected Gmail tool to perform the task. Do not simply say that you cannot send emails when the tool is available.\n\nExtract the recipient, subject, and message body from the user's request. If required information is missing, ask the user for it. Call the Gmail tool with the appropriate details, and report success only after the tool confirms that the email was sent. If the tool fails, explain the actual error."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        0
+      ],
+      "id": "18b6e114-8bb5-4326-8a8c-44b08d47fcef",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `When sending an email, use the recipient, subject, and message provided by the user. If the user does not specify a subject, create a concise, relevant subject line based on the email content instead of asking a follow-up question. If the user does not specify the message body, ask for it. Always end the email with:\n\nRegards,\nKajal\n\nUse the connected Gmail tool to send the email. Confirm success only after the tool reports that the email was sent.\nRegards,\nKajal\n\nDo not add any other personal signature unless the user explicitly requests it.`, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        192
+      ],
+      "id": "ad6d60b7-f217-4acf-bd2b-7815afd3dc02",
+      "name": "Send a message in Gmail",
+      "webhookId": "e5bcc21c-b7e0-4054-9965-dc31882c7762",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "F57dwssPFvXeUgc2",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        272,
+        192
+      ],
+      "id": "7df7c486-92b0-469c-93aa-a9c12fd809af",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "lY0AxqWRRqT7MQVD",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        432,
+        192
+      ],
+      "id": "3bfadede-c838-4255-8a21-5c5a1f9d990b",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f5fbc999-c49e-453b-a990-fb585aa92510",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "56bf4df93b49b1dbb6facade0dd17dd99441fc2e618867037b95431e5d2e7dca"
+  },
+  "nodeGroups": [],
+  "id": "lkxuycyGBHIEkHmy",
+  "tags": []
+}
